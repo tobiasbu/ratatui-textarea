@@ -112,6 +112,7 @@ pub struct TextArea<'a> {
     hard_tab_indent: bool,
     history: History,
     cursor_line_style: Style,
+    pub(crate) active_line_row_style: Option<Style>,
     line_number_style: Option<Style>,
     pub(crate) viewport: Viewport,
     pub(crate) cursor_style: Style,
@@ -227,6 +228,7 @@ impl<'a> TextArea<'a> {
             line_number_style: None,
             viewport: Viewport::default(),
             cursor_style: Style::default().add_modifier(Modifier::REVERSED),
+            active_line_row_style: None,
             yank: YankText::default(),
             #[cfg(feature = "search")]
             search: Search::default(),
@@ -1918,6 +1920,29 @@ impl<'a> TextArea<'a> {
     /// Get the style of cursor line. By default it is styled with underline.
     pub fn cursor_line_style(&self) -> Style {
         self.cursor_line_style
+    }
+
+    pub fn set_active_line_row_style(&mut self, style: Style) {
+        self.active_line_row_style = Some(style);
+    }
+
+    pub fn clear_active_line_row_style(&mut self) {
+        self.active_line_row_style = None;
+    }
+
+    pub fn active_line_row_style(&self) -> Option<Style> {
+        self.active_line_row_style
+    }
+
+    /// Number of visual (post-wrap) rows for the current content and area.
+    pub fn visual_row_count(&self) -> usize {
+        self.screen_lines.borrow().len()
+    }
+
+    /// Update the cached render area and rebuild the screen map.
+    pub fn set_render_area(&mut self, area: Rect) {
+        self.area.set(area);
+        self.refresh_screen_map();
     }
 
     /// Set the style of line number. By setting the style with this method, line numbers are drawn in textarea, meant

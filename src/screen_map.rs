@@ -5,14 +5,14 @@ use crate::wrap::{WrapMode, WrappedLine, effective_wrap_width, wrapped_rows};
 use unicode_width::UnicodeWidthChar;
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct ScreenLine {
+pub struct ScreenLine {
     pub wrapped: WrappedLine,
     pub screen_width: usize,
     pub cursor_max_col: usize,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub(crate) struct DataLine {
+pub struct DataLine {
     pub first_screen_line: usize,
     pub screen_line_count: usize,
     pub pure_ascii: bool,
@@ -139,19 +139,19 @@ impl TextArea<'_> {
         *self.data_pointers.borrow_mut() = data_pointers;
     }
 
-    pub(crate) fn screen_lines_count(&self) -> usize {
+    pub fn screen_lines_count(&self) -> usize {
         self.screen_lines.borrow().len()
     }
 
-    pub(crate) fn screen_line_width(&self, row: usize) -> usize {
+    pub fn screen_line_width(&self, row: usize) -> usize {
         self.screen_lines.borrow()[row].screen_width
     }
 
-    pub(crate) fn screen_line_max_cursor_col(&self, row: usize) -> usize {
+    pub fn screen_line_max_cursor_col(&self, row: usize) -> usize {
         self.screen_lines.borrow()[row].cursor_max_col
     }
 
-    pub(crate) fn screen_line(&self, row: usize) -> ScreenLine {
+    pub fn screen_line(&self, row: usize) -> ScreenLine {
         self.screen_lines.borrow()[row]
     }
 

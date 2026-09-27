@@ -149,7 +149,12 @@ impl Widget for &TextArea<'_> {
             }
             (placeholder, 0u16, 0u16)
         } else {
+          
             let top_row = self.scroll_top_row(prev_top_row, height);
+            let total_rows = self.screen_lines.borrow().len() as u16;
+            
+            let top_row = top_row.min(total_rows.saturating_sub(height));
+
             let top_col = if self.wrap_mode() == WrapMode::None {
                 self.scroll_top_col(prev_top_col, width)
             } else {
@@ -162,6 +167,27 @@ impl Widget for &TextArea<'_> {
                 top_col,
             )
         };
+
+
+        if let Some(style) = self.active_line_row_style {
+            let cursor_row = self.screen_cursor().row as u16;
+            // cursor_row is an absolute screen row; top_row is the first
+            // visible absolute screen row. If the cursor is within the
+            // viewport, paint that single row.
+            if cursor_row >= top_row && cursor_row < top_row.saturating_add(height)
+            {
+                let y = inner_area.y + (cursor_row - top_row);
+                buf.set_style(
+                    Rect {
+                        x: inner_area.x,
+                        y,
+                        width: inner_area.width,
+                        height: 1,
+                    },
+                    style,
+                );
+            }
+        }
 
         // To get fine control over the text color and the surrrounding block they have to be rendered separately
         // see https://github.com/ratatui/ratatui/issues/144
